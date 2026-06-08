@@ -33,7 +33,7 @@ jobs:
   # Keeping only Linux jobs for testing EngFlow RE
 
   # Handled separately from `test` to speed up execution of workers-sdk-test which depends on it.
-  # Using free ubuntu-latest runner for testing
+  # Using free ubuntu-latest runner with EngFlow RE
   test-linux:
     uses: ./.github/workflows/_bazel.yml
     with:
@@ -41,7 +41,7 @@ jobs:
       os_name: linux
       arch_name: 'X64'
       suffix: ''
-      extra_bazel_args: '--config=ci-test --config=ci-linux --config=wpt-report'
+      extra_bazel_args: '--config=ci-test --config=ci-linux --config=ci-remote --config=wpt-report'
       upload_test_logs: true
       upload_binary: true
       build_container_images: true
@@ -49,6 +49,8 @@ jobs:
       BAZEL_CACHE_KEY: ${{ secrets.BAZEL_CACHE_KEY }}
       WORKERS_MIRROR_URL: ${{ secrets.WORKERS_MIRROR_URL }}
       GOOGLESOURCE_COOKIE: ${{ secrets.GOOGLESOURCE_COOKIE }}
+      ENGFLOW_AUTH_TOKEN: ${{ secrets.ENGFLOW_AUTH_TOKEN }}
+      ENGFLOW_CLUSTER: ${{ secrets.ENGFLOW_CLUSTER }}
 
   # Test EngFlow Remote Execution
   test-linux-engflow:

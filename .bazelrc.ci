@@ -20,6 +20,9 @@ build:ci-remote --extra_toolchains=//platform/linux_x64:cc-toolchain
 # Don't auto-detect C++ toolchain, use what's defined in platform
 build:ci-remote --action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
 
+# Run genrules locally (they often use local tools like Python)
+build:ci-remote --strategy=Genrule=local
+
 # Performance tuning
 build:ci-remote --jobs=200
 build:ci-remote --remote_timeout=3600

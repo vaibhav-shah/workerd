@@ -11,10 +11,7 @@ build:ci-remote --bes_header=x-engflow-auth-token=ENGFLOW_TOKEN_PLACEHOLDER
 build:ci-remote --remote_header=x-engflow-auth-method=jwt-v0
 build:ci-remote --remote_header=x-engflow-auth-token=ENGFLOW_TOKEN_PLACEHOLDER
 
-# Specify container for remote workers (OSFamily already in platform definition)
-build:ci-remote --remote_default_exec_properties=container-image=docker://gcr.io/bazel-public/ubuntu2004-java11@sha256:69a78f121230c6d5cbfe2f4af8ce65481aa3f2acaaaf8e899df335f1ac1b35b5
-
-# Platform configuration for remote execution
+# Platform configuration for remote execution (exec_properties set in platform definition)
 build:ci-remote --extra_execution_platforms=//platform/linux_x64
 build:ci-remote --host_platform=//platform/linux_x64
 build:ci-remote --platforms=//platform/linux_x64

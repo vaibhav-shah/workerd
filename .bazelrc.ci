@@ -1,0 +1,22 @@
+# EngFlow Remote Execution for CI
+# This file is loaded via --bazelrc flag in CI workflows
+
+# Core RE configuration (cluster and auth will be set via flags in workflow)
+build:ci-remote --remote_executor=grpcs://ENGFLOW_CLUSTER_PLACEHOLDER
+build:ci-remote --remote_cache=grpcs://ENGFLOW_CLUSTER_PLACEHOLDER
+build:ci-remote --bes_backend=grpcs://ENGFLOW_CLUSTER_PLACEHOLDER
+build:ci-remote --bes_results_url=https://ENGFLOW_CLUSTER_PLACEHOLDER/invocations/
+
+# Authentication via headers (token will be set via --remote_header flag)
+build:ci-remote --bes_header=x-engflow-auth-method=jwt-v0
+
+# Target Linux for remote execution
+build:ci-remote --platforms=//:linux_x64_remote
+
+# Performance tuning
+build:ci-remote --jobs=200
+build:ci-remote --remote_timeout=3600
+build:ci-remote --remote_download_minimal
+build:ci-remote --disk_cache=
+build:ci-remote --incompatible_strict_action_env=true
+build:ci-remote --grpc_keepalive_time=30s

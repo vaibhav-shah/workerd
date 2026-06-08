@@ -99,6 +99,25 @@ jobs:
       WORKERS_MIRROR_URL: ${{ secrets.WORKERS_MIRROR_URL }}
       GOOGLESOURCE_COOKIE: ${{ secrets.GOOGLESOURCE_COOKIE }}
 
+  # Test EngFlow Remote Execution
+  test-linux-engflow:
+    uses: ./.github/workflows/_bazel.yml
+    with:
+      image: ubuntu-22.04-16core
+      os_name: linux
+      arch_name: 'X64'
+      suffix: '-engflow'
+      extra_bazel_args: '--config=ci-test --config=ci-linux --config=ci-remote'
+      upload_test_logs: false
+      upload_binary: false
+      build_container_images: false
+    secrets:
+      BAZEL_CACHE_KEY: ${{ secrets.BAZEL_CACHE_KEY }}
+      WORKERS_MIRROR_URL: ${{ secrets.WORKERS_MIRROR_URL }}
+      GOOGLESOURCE_COOKIE: ${{ secrets.GOOGLESOURCE_COOKIE }}
+      ENGFLOW_AUTH_TOKEN: ${{ secrets.ENGFLOW_AUTH_TOKEN }}
+      ENGFLOW_CLUSTER: ${{ secrets.ENGFLOW_CLUSTER }}
+
   lint:
     uses: ./.github/workflows/_bazel.yml
     with:

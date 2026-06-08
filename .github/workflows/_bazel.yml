@@ -139,14 +139,11 @@ jobs:
             # Replace placeholder with actual cluster
             sed "s/ENGFLOW_CLUSTER_PLACEHOLDER/${{ secrets.ENGFLOW_CLUSTER }}/g" .bazelrc.ci > .bazelrc.ci.tmp
             mv .bazelrc.ci.tmp .bazelrc.ci
-            echo "DEBUG: Checking .bazelrc.ci after substitution:"
-            grep -E "remote_executor|remote_cache|bes_backend" .bazelrc.ci || echo "No remote config found"
             # Import CI bazelrc and use remote config
             BAZEL_CMD="bazel --bazelrc=.bazelrc.ci"
             BUILD_FLAGS="--config=ci-remote"
             BUILD_FLAGS="$BUILD_FLAGS --remote_header=x-engflow-auth-token=${{ secrets.ENGFLOW_AUTH_TOKEN }}"
             BUILD_FLAGS="$BUILD_FLAGS --bes_header=x-engflow-auth-token=${{ secrets.ENGFLOW_AUTH_TOKEN }}"
-            echo "DEBUG: ENGFLOW_CLUSTER is set to: ${{ secrets.ENGFLOW_CLUSTER }}"
           else
             BAZEL_CMD="bazel"
             BUILD_FLAGS="--remote_cache=https://bazel:${{ secrets.BAZEL_CACHE_KEY }}@bazel-remote-cache.devprod.cloudflare.dev"

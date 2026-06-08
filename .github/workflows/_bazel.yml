@@ -76,6 +76,10 @@ on:
         required: false
       GOOGLESOURCE_COOKIE:
         required: true
+      ENGFLOW_AUTH_TOKEN:
+        required: false
+      ENGFLOW_CLUSTER:
+        required: false
 
 permissions:
   # Read repo
@@ -130,7 +134,20 @@ jobs:
           bazel --nowindows_enable_symlinks build ${{ inputs.extra_bazel_args }} --config=ci --profile build-win-workaround.bazel-profile.gz --remote_cache=https://bazel:${{ secrets.BAZEL_CACHE_KEY }}@bazel-remote-cache.devprod.cloudflare.dev //src/wpt:wpt-all@tsproject //src/node:node@tsproject //src/pyodide:pyodide_static@tsproject
       - name: Bazel build
         run: |
-          bazel build --remote_cache=https://bazel:${{ secrets.BAZEL_CACHE_KEY }}@bazel-remote-cache.devprod.cloudflare.dev  --config=ci ${{ inputs.extra_bazel_args }} //...
+          # Configure EngFlow if secrets are present
+          if [ ! -z "${{ secrets.ENGFLOW_CLUSTER }}" ]; then
+            # Replace placeholders with actual values
+            sed "s/ENGFLOW_CLUSTER_PLACEHOLDER/${{ secrets.ENGFLOW_CLUSTER }}/g" .bazelrc.ci | \
+              sed "s/ENGFLOW_TOKEN_PLACEHOLDER/${{ secrets.ENGFLOW_AUTH_TOKEN }}/g" > .bazelrc.ci.tmp
+            mv .bazelrc.ci.tmp .bazelrc.ci
+            # Import CI bazelrc and use remote config
+            BAZEL_CMD="bazel --bazelrc=.bazelrc.ci"
+            BUILD_FLAGS="--config=ci-remote"
+          else
+            BAZEL_CMD="bazel"
+            BUILD_FLAGS="--remote_cache=https://bazel:${{ secrets.BAZEL_CACHE_KEY }}@bazel-remote-cache.devprod.cloudflare.dev"
+          fi
+          $BAZEL_CMD build $BUILD_FLAGS --config=ci ${{ inputs.extra_bazel_args }} //...
       - name: Configure Docker daemon for IPv6
         if: inputs.build_container_images
         run: |

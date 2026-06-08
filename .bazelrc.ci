@@ -1,0 +1,54 @@
+# EngFlow Remote Execution for CI
+# This file is loaded via --bazelrc flag in CI workflows
+
+# Core RE configuration (cluster and auth will be set via flags in workflow)
+build:ci-remote --remote_executor=grpcs://ENGFLOW_CLUSTER_PLACEHOLDER
+build:ci-remote --remote_cache=grpcs://ENGFLOW_CLUSTER_PLACEHOLDER
+
+# Authentication via headers
+build:ci-remote --bes_header=x-engflow-auth-method=jwt-v0
+build:ci-remote --bes_header=x-engflow-auth-token=ENGFLOW_TOKEN_PLACEHOLDER
+build:ci-remote --remote_header=x-engflow-auth-method=jwt-v0
+build:ci-remote --remote_header=x-engflow-auth-token=ENGFLOW_TOKEN_PLACEHOLDER
+
+# Platform configuration for remote execution (exec_properties set in platform definition)
+build:ci-remote --extra_execution_platforms=//platform/linux_x64
+build:ci-remote --host_platform=//platform/linux_x64
+build:ci-remote --platforms=//platform/linux_x64
+build:ci-remote --extra_toolchains=//platform/linux_x64:cc-toolchain
+
+# Don't auto-detect C++ toolchain, use what's defined in platform
+build:ci-remote --action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
+
+# Run genrules locally (they often use local tools like Python)
+build:ci-remote --strategy=Genrule=local
+
+# Override workerd flags that are incompatible with clang-10 in ubuntu2004 container
+build:ci-remote --cxxopt='-gno-simple-template-names'
+build:ci-remote --host_cxxopt='-gno-simple-template-names'
+build:ci-remote --linkopt='-fuse-ld=gold'
+
+# Performance tuning
+build:ci-remote --jobs=200
+build:ci-remote --remote_timeout=3600
+build:ci-remote --remote_download_minimal
+build:ci-remote --disk_cache=
+build:ci-remote --incompatible_strict_action_env=true
+build:ci-remote --grpc_keepalive_time=30s
+
+# Alternative: Simple cross-compile config (no custom toolchain)
+build:ci-remote-simple --remote_executor=grpcs://ENGFLOW_CLUSTER_PLACEHOLDER
+build:ci-remote-simple --remote_cache=grpcs://ENGFLOW_CLUSTER_PLACEHOLDER
+build:ci-remote-simple --bes_header=x-engflow-auth-method=jwt-v0
+build:ci-remote-simple --bes_header=x-engflow-auth-token=ENGFLOW_TOKEN_PLACEHOLDER
+build:ci-remote-simple --remote_header=x-engflow-auth-method=jwt-v0
+build:ci-remote-simple --remote_header=x-engflow-auth-token=ENGFLOW_TOKEN_PLACEHOLDER
+build:ci-remote-simple --remote_default_exec_properties=container-image=docker://gcr.io/bazel-public/ubuntu2004-java11@sha256:69a78f121230c6d5cbfe2f4af8ce65481aa3f2acaaaf8e899df335f1ac1b35b5
+build:ci-remote-simple --remote_default_exec_properties=OSFamily=Linux
+build:ci-remote-simple --action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
+build:ci-remote-simple --jobs=200
+build:ci-remote-simple --remote_timeout=3600
+build:ci-remote-simple --remote_download_minimal
+build:ci-remote-simple --disk_cache=
+build:ci-remote-simple --incompatible_strict_action_env=true
+build:ci-remote-simple --grpc_keepalive_time=30s

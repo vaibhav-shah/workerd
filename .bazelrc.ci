@@ -7,8 +7,11 @@ build:ci-remote --remote_cache=grpcs://ENGFLOW_CLUSTER_PLACEHOLDER
 build:ci-remote --bes_backend=grpcs://ENGFLOW_CLUSTER_PLACEHOLDER
 build:ci-remote --bes_results_url=https://ENGFLOW_CLUSTER_PLACEHOLDER/invocations/
 
-# Authentication via headers (token will be set via --remote_header flag)
+# Authentication via headers
 build:ci-remote --bes_header=x-engflow-auth-method=jwt-v0
+build:ci-remote --bes_header=x-engflow-auth-token=ENGFLOW_TOKEN_PLACEHOLDER
+build:ci-remote --remote_header=x-engflow-auth-method=jwt-v0
+build:ci-remote --remote_header=x-engflow-auth-token=ENGFLOW_TOKEN_PLACEHOLDER
 
 # Target Linux for remote execution
 build:ci-remote --platforms=//:linux_x64_remote

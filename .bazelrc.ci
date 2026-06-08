@@ -23,6 +23,11 @@ build:ci-remote --action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
 # Run genrules locally (they often use local tools like Python)
 build:ci-remote --strategy=Genrule=local
 
+# Override workerd flags that are incompatible with clang-10 in ubuntu2004 container
+build:ci-remote --cxxopt='-gno-simple-template-names'
+build:ci-remote --host_cxxopt='-gno-simple-template-names'
+build:ci-remote --linkopt='-fuse-ld=gold'
+
 # Performance tuning
 build:ci-remote --jobs=200
 build:ci-remote --remote_timeout=3600

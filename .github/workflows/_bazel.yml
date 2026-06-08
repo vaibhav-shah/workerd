@@ -136,16 +136,19 @@ jobs:
         run: |
           # Configure EngFlow if secrets are present
           if [ ! -z "${{ secrets.ENGFLOW_CLUSTER }}" ]; then
-            ENGFLOW_FLAGS="--bazelrc=.bazelrc.ci --config=ci-remote"
-            ENGFLOW_FLAGS="$ENGFLOW_FLAGS --remote_header=x-engflow-auth-token=${{ secrets.ENGFLOW_AUTH_TOKEN }}"
-            ENGFLOW_FLAGS="$ENGFLOW_FLAGS --bes_header=x-engflow-auth-token=${{ secrets.ENGFLOW_AUTH_TOKEN }}"
             # Replace placeholder with actual cluster
             sed "s/ENGFLOW_CLUSTER_PLACEHOLDER/${{ secrets.ENGFLOW_CLUSTER }}/g" .bazelrc.ci > .bazelrc.ci.tmp
             mv .bazelrc.ci.tmp .bazelrc.ci
+            # Import CI bazelrc and use remote config
+            BAZEL_CMD="bazel --bazelrc=.bazelrc.ci"
+            BUILD_FLAGS="--config=ci-remote"
+            BUILD_FLAGS="$BUILD_FLAGS --remote_header=x-engflow-auth-token=${{ secrets.ENGFLOW_AUTH_TOKEN }}"
+            BUILD_FLAGS="$BUILD_FLAGS --bes_header=x-engflow-auth-token=${{ secrets.ENGFLOW_AUTH_TOKEN }}"
           else
-            ENGFLOW_FLAGS="--remote_cache=https://bazel:${{ secrets.BAZEL_CACHE_KEY }}@bazel-remote-cache.devprod.cloudflare.dev"
+            BAZEL_CMD="bazel"
+            BUILD_FLAGS="--remote_cache=https://bazel:${{ secrets.BAZEL_CACHE_KEY }}@bazel-remote-cache.devprod.cloudflare.dev"
           fi
-          bazel build $ENGFLOW_FLAGS --config=ci ${{ inputs.extra_bazel_args }} //...
+          $BAZEL_CMD build $BUILD_FLAGS --config=ci ${{ inputs.extra_bazel_args }} //...
       - name: Configure Docker daemon for IPv6
         if: inputs.build_container_images
         run: |
